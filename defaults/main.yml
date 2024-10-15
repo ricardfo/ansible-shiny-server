@@ -2,6 +2,9 @@
 ---
 shiny_server_version: 1.5.16.958
 shiny_server_install: []
+shiny_server_operating_system: "ubuntu-14.04"
+shiny_server_apt_package: "shiny-server"
+shiny_server_use_apt: false
 
 shiny_server_conf_directives:
   - |

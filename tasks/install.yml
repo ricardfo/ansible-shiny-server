@@ -16,6 +16,14 @@
   tags:
     - shiny-server-install-additional
 
+- name: install | using apt (apt-package)
+  ansible.builtin.apt:
+    name: "{{ shiny_server_apt_package }}"
+    state: "{{ apt_install_state | default('latest') }}"
+  when: shiny_server_use_apt
+  tags:
+    - shiny-server-install-using-apt
+
 - name: install | create (download) directory
   ansible.builtin.file:
     path: "{{ shiny_server_downloads_path }}"
@@ -23,6 +31,7 @@
     owner: root
     group: root
     mode: 0755
+  when: not shiny_server_use_apt
   tags:
     - shiny-server-install-download
     - shiny-server-install-download-directory
@@ -30,10 +39,11 @@
 - name: install | download deb  # noqa command-instead-of-module
   ansible.builtin.command: >
     curl -sSL
-    https://download3.rstudio.org/ubuntu-14.04/{{ ansible_machine }}/shiny-server-{{ shiny_server_version }}-{{ shiny_server_machine_map[ansible_machine] }}.deb
+    https://download3.rstudio.org/{{ shiny_server_operating_system }}/{{ ansible_machine }}/shiny-server-{{ shiny_server_version }}-{{ shiny_server_machine_map[ansible_machine] }}.deb
     -o {{ shiny_server_downloads_path }}/shiny-server_{{ shiny_server_version }}_{{ shiny_server_machine_map[ansible_machine] }}.deb
   args:
     creates: "{{ shiny_server_downloads_path }}/shiny-server_{{ shiny_server_version }}_{{ shiny_server_machine_map[ansible_machine] }}.deb"
+  when: not shiny_server_use_apt
   tags:
     - shiny-server-install-download
     - shiny-server-install-download-deb
@@ -41,6 +51,7 @@
 - name: install | install deb
   ansible.builtin.apt:
     deb: "{{ shiny_server_downloads_path }}/shiny-server_{{ shiny_server_version }}_{{ shiny_server_machine_map[ansible_machine] }}.deb"
+  when: not shiny_server_use_apt
   tags:
     - shiny-server-install-install
     - shiny-server-install-install-deb
